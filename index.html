@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8' />
+<title>Vermont Statewide Parcel Values</title>
+<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.8.0/mapbox-gl.js'></script>
+<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.8.0/mapbox-gl.css' rel='stylesheet' />
+<style>
+body { margin:0; padding:0; }
+#map { position:absolute; top:0; bottom:0; width:100%; }
+
+.map-overlay {
+  position: fixed;
+  top: 50;
+  left: 50;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  margin-left: 20px;
+  margin-top: 20px;
+  font-family: Arial, sans-serif;
+  overflow: auto;
+  border-radius: 3px;
+}
+
+</style>
+</head>
+<body>
+
+<style>
+        .mapboxgl-popup {
+            max-width: 400px;
+            font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+        }
+</style>
+<div id='map'></div>
+<div class='map-overlay'><h2>Vermont Parcel Values</h2><p>This map compares the use category and listed value of parcels in Vermont.<br>
+   Heights of the parcels are scaled on property values in dollars per acre,<br>
+   adjusted to the <a href="https://tax.vermont.gov/property-owners/understanding-property-taxes/education-tax-rates/faqs"
+   target="_blank">common level of appraisal.</a> Parcels are colored by their<br>
+   grand list use category and can be seen by clicking on a parcel.<br>
+   Current data is based on the 2018 grand list.<br>
+   For more information about the Vermont Parcel project please visit the <br>
+   <a href="https://vcgi.vermont.gov/data-and-programs/parcel-program" target="_blank">Program Page</a>.
+   This visualization is for comparative, informational purposes only.
+   </p></div>
+
+<script>
+mapboxgl.accessToken = 'pk.eyJ1IjoidmNnaW1hcGJveCIsImEiOiJjamRnNmkwdTIwZjY4MnFvMGF0N2JwOGU1In0.tdLVOnx8wtNT7LNOo6SCDg';
+var map = new mapboxgl.Map({
+container: 'map', // container id
+style: 'mapbox://styles/vcgimapbox/ck70hcppr1bq71iokcmr5gw3s', // use this to change which style
+center: [-72.55, 44.25], // starting position [lng, lat]
+zoom: 11, // starting zoom
+pitch: 60  // starting pitch
+});
+
+// Change the cursor style as a UI indicator.
+map.on('load', function() {
+  map.on('mouseenter', 'parcel-values-wm-simplified', function() {
+      map.getCanvas().style.cursor = 'pointer';
+  });
+  map.on('mouseleave', 'parcel-values-wm-simplified', function() {
+      map.getCanvas().style.cursor = '';
+  });
+  // Populate the popup and set its coordinates
+  // based on the feature found.
+    map.on('click', 'parcel-values-wm-simplified', function(e) {
+        var coordinates = e.lngLat;
+        //var owner = e.features[0].properties.owner1;
+        var use = e.features[0].properties.use;
+        var value = e.features[0].properties.cla_full_l;
+        var value_acre = e.features[0].properties.value_acre;
+        var town = e.features[0].properties.town;
+
+        new mapboxgl.Popup()
+            .setLngLat(coordinates)
+            .setHTML('<strong>Category: </strong>' + use +
+             '<br><strong>Value: </strong>$' + value +
+             '<br><strong>Value per acre: </strong>$' + value_acre +
+             '<br><strong>Town: </strong>' + town + '</span>')
+            .addTo(map);
+    });
+});
+
+map.addControl(new mapboxgl.NavigationControl());
+
+</script>
+
+</body>
+</html
